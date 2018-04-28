@@ -26,18 +26,20 @@ app.controller("controller", function($scope, $http, $window, sharedProperties){
               //$window.alert(searchItemsArray);
           }
         else{
+            //if the searchItem has more than one element
             searchItemsArray = [];
             searchItemsArray= (JSON.parse(recentSearch));
             delIndex = -1;
             for(i in searchItemsArray)
-            {
+            {   //This is done in order to check if the search is already present
                 if(searchItemsArray[i].Title == Title && searchItemsArray[i].Year == Year)
-                {
+                {   //if present then remove it from the searcList
                     delIndex = i;
                     searchItemsArray.splice(delIndex,1);
                     break;
                 }
             }
+            //Take only the last five recent searches
             if(searchItemsArray.length == 5)
                 searchItemsArray.shift();
             searchItemsArray.push(searchItem);
@@ -45,6 +47,7 @@ app.controller("controller", function($scope, $http, $window, sharedProperties){
         localStorage.setItem("recentSearchList",JSON.stringify(searchItemsArray));
         if(Title!=null && Year!=null)
         {
+            //Check if Both title and year are not entered by the user
             $http.get('http://www.omdbapi.com/?i=tt3896198&apikey=278d2ff3&t='+Title+'&y='+Year)
                 .then(function mySucces(response)
                       {
@@ -57,6 +60,7 @@ app.controller("controller", function($scope, $http, $window, sharedProperties){
         }
         if(Year!=null && Title==null)
         {
+            //Check if both values are entered by the user
             $http.get('http://www.omdbapi.com/?i=tt3896198&apikey=278d2ff3&y='+Year)
                 .then(function mySucces(response){
                 $scope.error = "";
@@ -83,8 +87,10 @@ app.controller("controller", function($scope, $http, $window, sharedProperties){
 
 
 app.controller("resultController", function($scope, $window,sharedProperties){
+    //Controller used to redirect search results to new page
    $scope.checked=false;
     $scope.Movie = sharedProperties.getData();
+    //Display table only if search result is valid
     if($scope.Movie.Response=="False")
         $scope.checked=true;
     $scope.home = function() {
@@ -95,6 +101,7 @@ app.controller("resultController", function($scope, $window,sharedProperties){
 
 
 app.service('sharedProperties', function() {
+    //Service used to share vaiables between controllers. One controller gets input from user and the other Controller displays result.
     return {
         getData: function() {
             return angular.fromJson(sessionStorage.sharedProperties);
